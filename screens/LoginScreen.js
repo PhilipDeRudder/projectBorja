@@ -4,6 +4,8 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Anim
 import StandardButton from '../components/StandardButton';
 import InputField from '../components/InputField';
 import Firebase from '../config/Firebasje';  
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 
 class LoginScreen extends React.Component {
@@ -39,6 +41,7 @@ class LoginScreen extends React.Component {
         }
     }
 
+    
     handleValidEmail = (val) => {
         global.emailUser = this.state.email;
         var regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -54,7 +57,36 @@ class LoginScreen extends React.Component {
             this.state.isValidEmail = false;
         }
     }
+    
 
+    goToRegister = () => {
+        this.props.changeComponent('Two');
+    }
+
+    goToMain = () => {
+        this.props.changeComponent('Three');
+    }
+
+    handleLogin = () => {
+        if (this.state.password == "") {
+            alert('Give input to all fields');
+            return;
+        } else {
+            if (this.state.email == "") {
+                alert('Give input to all fields');
+                return;
+            } else {
+                if (this.state.password.trim().length <= 5) {
+                    alert('give a password longer than 6 signs.');
+                    return;
+                } else {
+                    Firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+                        .then(this.authSuccessfull, this.goToMain) //Authentication was successfull
+                        .catch(error => this.authNotSuccessfull(error)) //Authentication was not successfull
+                }
+            }
+        }
+    }
 
 
 
@@ -72,10 +104,6 @@ class LoginScreen extends React.Component {
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
-                { this.state.isValidEmail ? null :
-                    <Text style={styles.errorMessage}>The email needs to look like xxx@domain.</Text>
-                }
-
                 <InputField
                     labelValue={this.state.password}
                     onChangeText={(password) => this.setState({ password }, (password) => this.handleValidPassword(this.state.password))}
@@ -90,10 +118,10 @@ class LoginScreen extends React.Component {
 
                 <StandardButton
                     buttonTitle="Log In"
-                   
+                    onPress={()=>this.handleLogin()}
                 />
 
-                <TouchableOpacity style={styles.forgotButton} >
+                <TouchableOpacity style={styles.forgotButton} onPress={() => this.goToRegister()} >
                     <Text style={styles.navButtonText} >Not registered yet? Register here</Text>
                 </TouchableOpacity>
 

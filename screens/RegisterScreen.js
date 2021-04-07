@@ -3,7 +3,8 @@ import React, { Component, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import StandardButton from '../components/StandardButton';
 import InputField from '../components/InputField';
-
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import Firebase from '../config/Firebasje';
 
 
@@ -51,17 +52,17 @@ class RegisterScreen extends React.Component {
 
     //De Email moet voldoen aan de regex van een email "XX@domain.com" Een doorsnee email is ook langer dan 5 tekens
     handleValidEmail = (val) => {
-        var regEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        var regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if (val.trim().length >= 5) {
             if (regEmail.test(val)) {
                 this.state.isValidEmail = true;
             }
             else {
-                this.state.isValidEmail = false;
+                this.state.isValidEmail = true;
             }
         }
         else {
-            this.state.isValidEmail = false;
+            this.state.isValidEmail = true;
         }
     }
 
@@ -96,10 +97,6 @@ class RegisterScreen extends React.Component {
             }
             console.log("name: ", this.state.name);
             if (this.state.isvalidUsername) {
-                if (this.state.username == "") {
-                    alert("Geef input bij de username");
-                    return;
-                }
                 console.log("username: ", this.state.username);
                 if (this.state.isValidPassword) {
                     if (this.state.password == "") {
@@ -127,11 +124,14 @@ class RegisterScreen extends React.Component {
     }
 
     
+    goToLogin = () => {
+        this.props.changeComponent('One');
+    }
 
     handleSignUp = () => {
         Firebase.auth()         //User wordt aangemaakt in FireBase -> voor authenticatie (veiliger dan wanneer we deze info in de API zouden bewaren)
             .createUserWithEmailAndPassword(this.state.email, this.state.password)
-            .then(() => this.props.navigation.navigate('LoginScreen'))
+            .then(() => this.goToLogin())
             .catch(error => console.log(error))
     }
 
@@ -143,15 +143,6 @@ class RegisterScreen extends React.Component {
                     labelValue={this.state.name}
                     onChangeText={(name) => this.setState({ name }, (name) => this.handleValidName(this.state.name))}
                     placeholderText="Name"
-                    iconType="user"
-                    secureTextEntry={false}
-                    autoCapitalize="none"
-                />
-
-                <InputField
-                    labelValue={this.state.username}
-                    onChangeText={(username) => this.setState({ username }, (username) => this.handleValidUsername(this.state.username))}
-                    placeholderText="Username"
                     iconType="user"
                     secureTextEntry={false}
                     autoCapitalize="none"
@@ -190,7 +181,7 @@ class RegisterScreen extends React.Component {
                     onPress={() => { this.handleRegister() }}
                 />
 
-                <TouchableOpacity style={styles.forgotButton} onPress={() => this.props.navigation.navigate('LoginScreen')}>
+                <TouchableOpacity style={styles.forgotButton} onPress={() => this.goToLogin()}>
                     <Text style={styles.navButtonText} >Already registered? Sign in</Text>
                 </TouchableOpacity>
 

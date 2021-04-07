@@ -4,9 +4,11 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, Anim
 import StandardButton from '../components/StandardButton';
 import InputField from '../components/InputField';
 import Firebase from '../config/Firebasje';  
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 
-class LoginScreen extends React.Component {
+class MainScreen extends React.Component {
 
     constructor(props) {
         super(props);
@@ -29,7 +31,7 @@ class LoginScreen extends React.Component {
     }
 }
 
-export default LoginScreen;
+export default MainScreen;
 
 const styles = StyleSheet.create({
     container: {
